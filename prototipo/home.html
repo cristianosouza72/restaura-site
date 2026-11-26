@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restaura · Home da Estação</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" type="image/svg+xml" href="assets/brand/RESTAURA_Simbolo_Colorida.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400;1,7..72,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a home em camadas. Primeiro a mensagem da estação (cor litúrgica = acento),
+   depois os livros ligados a ela, as leituras, o calendário e, por fim, a estante completa. */
+:root {
+  --bg: #F5F4F7;
+  --surface: #FFFFFF;
+  --fg: #1D1B24;
+  --muted: #5E5A6B;
+  --line: #DCD9E3;
+  /* cores litúrgicas: o acento do site muda com a estação */
+  --violeta: #4A2D6E;
+  --dourado: #85600F;
+  --verde: #2E5C44;
+  --vermelho: #962B28;
+  --accent: var(--violeta);
+  --font-display: "Literata", Georgia, "Times New Roman", serif;
+  --font-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2rem;
+  --step-4: clamp(2.25rem, 4.6vw, 3.6rem);
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15131B; --surface: #1E1B26; --fg: #ECE9F2; --muted: #A9A4B6; --line: #34303F;
+    --violeta: #BCA6E2; --dourado: #E3BC62; --verde: #8FCBA8; --vermelho: #F0948B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15131B; --surface: #1E1B26; --fg: #ECE9F2; --muted: #A9A4B6; --line: #34303F;
+  --violeta: #BCA6E2; --dourado: #E3BC62; --verde: #8FCBA8; --vermelho: #F0948B;
+  color-scheme: dark;
+}
+:root[data-season="advento"] { --accent: var(--violeta); }
+:root[data-season="natal"] { --accent: var(--dourado); }
+:root[data-season="comum"] { --accent: var(--verde); }
+:root[data-season="pentecostes"] { --accent: var(--vermelho); }
+:root {
+  --tint: color-mix(in srgb, var(--accent) 9%, var(--bg));
+  --tint-strong: color-mix(in srgb, var(--accent) 18%, var(--bg));
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.55; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; text-wrap: balance; margin: 0; line-height: 1.15; }
+.eyebrow { font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+.demo-tag { display: inline-block; font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: var(--muted); border: 1px dashed var(--line); padding: 1px 6px; border-radius: 3px; vertical-align: middle; }
+
+/* aviso de protótipo */
+.proto { background: var(--fg); color: var(--bg); font-size: var(--step--1); }
+.proto .wrap { padding-block: 6px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; text-align: center; }
+
+/* barra de benefícios (discreta) */
+.perks { border-bottom: 1px solid var(--line); font-size: var(--step--1); color: var(--muted); }
+.perks .wrap { padding-block: 7px; display: flex; gap: 8px 28px; justify-content: center; flex-wrap: wrap; }
+
+/* cabeçalho */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+header.site { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header.site .wrap { display: flex; align-items: center; gap: 24px; padding-block: 14px; }
+.logo { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
+.logo b { font-family: var(--font-display); font-weight: 600; font-size: 1.375rem; letter-spacing: 0.14em; }
+.logo img { width: 174px; height: 54px; object-fit: contain; object-position: left center; }
+header.site .logo img { width: 180px; }
+nav.main { display: flex; gap: 22px; margin-right: auto; }
+nav.main a { text-decoration: none; font-weight: 500; color: var(--muted); }
+nav.main a:hover, nav.main a[aria-current] { color: var(--fg); }
+.tools { display: flex; gap: 6px; align-items: center; }
+.icon-btn { background: none; border: 0; color: var(--fg); padding: 8px; border-radius: 50%; cursor: pointer; display: inline-flex; position: relative; }
+.icon-btn:hover { background: var(--tint); }
+.icon-btn svg { width: 21px; height: 21px; }
+.bag-count { position: absolute; top: 2px; right: 0; background: var(--accent); color: var(--bg); font-size: 0.625rem; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: grid; place-items: center; }
+
+/* hero da estação */
+.hero { background: var(--tint); border-bottom: 1px solid var(--line); }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 56px; padding-block: 64px 56px; align-items: center; }
+.hero h1 { font-size: var(--step-4); margin-block: 14px 22px; letter-spacing: -0.01em; }
+.verse { font-family: var(--font-display); font-style: italic; font-size: var(--step-1); line-height: 1.5; margin: 0 0 6px; max-width: 34em; }
+.verse-ref { font-size: var(--step--1); color: var(--muted); margin: 0 0 22px; letter-spacing: 0.02em; }
+.hero-text { max-width: 36em; color: var(--muted); margin: 0 0 28px; }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: var(--radius); font-weight: 600; font-size: 0.9375rem; text-decoration: none; border: 1px solid var(--accent); cursor: pointer; font-family: inherit; }
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--accent); }
+.btn-ghost:hover { background: var(--tint-strong); }
+
+/* coroa do Advento: semanas da estação */
+.season-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 26px 26px 20px; }
+.season-card h2 { font-size: var(--step-1); margin-bottom: 4px; }
+.season-card .sub { color: var(--muted); font-size: var(--step--1); margin: 0 0 18px; }
+.weeks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.weeks li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.weeks li:first-child { border-top: 0; }
+.candle { width: 12px; height: 30px; border-radius: 3px; background: var(--tint-strong); justify-self: center; position: relative; }
+.candle.lit { background: var(--accent); }
+.candle.lit::before { content: ""; position: absolute; left: 50%; top: -13px; width: 8px; height: 11px; margin-left: -4px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #E9A93B; animation: flicker 2.4s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes flicker { 0%,100% { transform: scale(1) rotate(-2deg); opacity: 1; } 50% { transform: scale(0.9, 1.08) rotate(2deg); opacity: .85; } }
+@media (prefers-reduced-motion: reduce) { .candle.lit::before { animation: none; } }
+.weeks .w-name { font-family: var(--font-display); font-size: 1.0625rem; }
+.weeks .w-note { display: block; font-family: var(--font-body); font-size: var(--step--1); color: var(--muted); }
+.weeks .w-date { font-size: var(--step--1); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.weeks li.next .w-date { color: var(--accent); font-weight: 600; }
+.season-foot { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.swatch { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); flex: none; }
+
+/* trecho (tempo comum) */
+.excerpt-card blockquote { margin: 0; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.55; }
+.excerpt-card blockquote::before { content: "“"; display: block; font-size: 3.5rem; line-height: .6; color: var(--accent); margin-bottom: 6px; }
+.excerpt-card .from { margin-top: 18px; display: flex; gap: 14px; align-items: center; font-size: var(--step--1); color: var(--muted); }
+
+/* seções */
+section.block { padding-block: 64px; }
+section.block + section.block { border-top: 1px solid var(--line); }
+.block-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.block-head h2 { font-size: var(--step-3); }
+.block-head p { margin: 6px 0 0; color: var(--muted); max-width: 42em; }
+.link-more { font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.link-more:hover { text-decoration: underline; }
+
+/* livros */
+.books { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+.books.six { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 22px; }
+.book { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.cover { aspect-ratio: 2 / 3; max-width: 100%; border-radius: 3px 6px 6px 3px; padding: 14% 12%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: inset 4px 0 0 rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08), 0 8px 22px -10px rgba(0,0,0,.35); transition: transform .25s ease; }
+.cover.real-cover { padding: 0; overflow: hidden; background: var(--surface); }
+.cover.real-cover img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.book-summary { font-size: var(--step--1); color: var(--muted); line-height: 1.45; margin: -2px 0 0; }
+.book:hover .cover { transform: translateY(-3px); }
+.cover .c-title { font-family: var(--font-display); font-weight: 500; font-size: clamp(0.95rem, 1.5vw, 1.25rem); line-height: 1.15; }
+.cover .c-author { font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: .8; }
+.cover .c-mark { font-family: var(--font-display); font-size: 0.625rem; letter-spacing: 0.22em; opacity: .75; }
+.c1 { background: #3B2A55; color: #F1EAFB; }
+.c2 { background: #D9CFBF; color: #2A2320; }
+.c3 { background: #22413A; color: #E5F1EA; }
+.c4 { background: #7A2E2A; color: #FBE9E4; }
+.c5 { background: #E7E3EE; color: #2B2738; }
+.c6 { background: #26303F; color: #E6ECF5; }
+.b-title { font-weight: 600; line-height: 1.3; margin: 0; }
+.b-author { font-size: var(--step--1); color: var(--muted); margin: 0; }
+.b-why { font-size: var(--step--1); color: var(--muted); margin: 0; font-style: italic; font-family: var(--font-display); }
+.format-field { display: grid; gap: 5px; }
+.format-field label { font-size: var(--step--1); font-weight: 600; }
+.format-field select { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--fg); font: inherit; }
+.format-note { min-height: 2.7em; margin: 0; color: var(--muted); font-size: 0.75rem; line-height: 1.35; }
+.price { display: grid; gap: 1px; font-variant-numeric: tabular-nums; }
+.price s { font-size: var(--step--1); color: var(--muted); }
+.price strong { font-size: 1.0625rem; }
+.price small { font-size: 0.75rem; color: var(--muted); }
+.buy { margin-top: auto; background: transparent; border: 1px solid var(--line); color: var(--fg); border-radius: var(--radius); padding: 9px 12px; font: 600 0.875rem var(--font-body); cursor: pointer; }
+.buy:hover { border-color: var(--accent); color: var(--accent); }
+.buy.added { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.store-links { display: grid; gap: 8px; }
+.store-link { display: block; border: 1px solid var(--line); border-radius: var(--radius); padding: 9px 12px; color: var(--fg); font: 600 0.875rem var(--font-body); text-align: center; text-decoration: none; }
+.store-link:hover { border-color: var(--accent); color: var(--accent); }
+
+/* sacola */
+.cart-backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(10, 8, 15, .38); opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.cart-backdrop.open { opacity: 1; pointer-events: auto; }
+.cart-drawer { position: fixed; z-index: 31; top: 0; right: 0; bottom: 0; width: min(420px, 92vw); background: var(--surface); border-left: 1px solid var(--line); transform: translateX(100%); transition: transform .25s ease; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-shadow: -20px 0 50px -30px rgba(0,0,0,.5); }
+.cart-drawer.open { transform: translateX(0); }
+.cart-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+.cart-head h2 { font-size: var(--step-2); }
+.cart-close { border: 0; background: none; color: var(--fg); font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; }
+.cart-items { overflow-y: auto; padding: 8px 22px; }
+.cart-empty { color: var(--muted); text-align: center; padding: 48px 12px; }
+.cart-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.cart-thumb { width: 64px; aspect-ratio: 2 / 3; border-radius: 4px; display: grid; place-items: center; overflow: hidden; }
+.cart-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cart-info strong { display: block; line-height: 1.25; }
+.cart-info small { color: var(--muted); }
+.qty { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.qty button { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 50%; background: var(--bg); color: var(--fg); cursor: pointer; }
+.cart-remove { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 0.8125rem; }
+.cart-foot { padding: 18px 22px 22px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+.cart-total { display: flex; justify-content: space-between; align-items: baseline; }
+.cart-total strong { font-size: var(--step-2); }
+.cart-foot .btn { justify-content: center; width: 100%; }
+
+/* leituras */
+.reads { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 40px; }
+.read-feature { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 32px; display: flex; flex-direction: column; gap: 14px; }
+.read-feature h3 { font-size: var(--step-3); }
+.read-feature p { margin: 0; color: var(--muted); max-width: 40em; }
+.meta { font-size: var(--step--1); color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.read-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.read-list li { padding: 18px 0; border-top: 1px solid var(--line); display: grid; gap: 6px; }
+.read-list li:first-child { border-top: 0; padding-top: 0; }
+.read-list h3 { font-size: var(--step-1); }
+.read-list a { text-decoration: none; }
+.read-list a:hover h3 { color: var(--accent); }
+
+/* calendário */
+.cal { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.cal-item { padding: 20px 18px; border-left: 1px solid var(--line); display: grid; gap: 4px; align-content: start; }
+.cal-item:first-child { border-left: 0; }
+.cal-day { font-family: var(--font-display); font-size: var(--step-3); line-height: 1; font-variant-numeric: tabular-nums; }
+.cal-mon { font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.cal-name { font-weight: 600; margin-top: 8px; line-height: 1.3; }
+.cal-note { font-size: var(--step--1); color: var(--muted); }
+.cal-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+/* estante */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { background: none; border: 1px solid var(--line); color: var(--muted); padding: 7px 14px; border-radius: 999px; font: 500 0.875rem var(--font-body); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* sobre + newsletter */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.about h2 { font-size: var(--step-3); margin-bottom: 16px; }
+.about p { color: var(--muted); margin: 0 0 12px; max-width: 34em; }
+.news { background: var(--tint); border-radius: 10px; padding: 30px; }
+.news h3 { font-size: var(--step-2); margin-bottom: 8px; }
+.news p { margin: 0 0 18px; color: var(--muted); }
+.news form { display: flex; gap: 10px; flex-wrap: wrap; }
+.news input { flex: 1 1 220px; min-width: 0; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; }
+.news .ok { margin: 12px 0 0; font-size: var(--step--1); color: var(--accent); font-weight: 600; }
+
+footer.site { border-top: 1px solid var(--line); padding-block: 44px 32px; font-size: var(--step--1); color: var(--muted); }
+.foot-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+.foot-grid h4 { margin: 0 0 10px; color: var(--fg); font-size: 0.8125rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.foot-grid a { text-decoration: none; }
+.foot-grid a:hover { color: var(--fg); }
+.pay { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.pay span { border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 0.6875rem; }
+.foot-bottom { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* simulador de estação (controle do protótipo) */
+.sim { position: fixed; z-index: 20; right: max(16px, calc(env(safe-area-inset-right, 0px) + 16px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; box-shadow: 0 10px 30px -12px rgba(0,0,0,.35); display: grid; gap: 8px; max-width: calc(100vw - 32px); }
+.sim-label { font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.sim-opts { display: flex; gap: 4px; flex-wrap: wrap; }
+.sim-opts button { border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 5px 11px; font: 500 0.8125rem var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.sim-opts button[aria-pressed="true"] { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+.sim-opts i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+@media (max-width: 960px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 44px; }
+  .books.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .reads, .about { grid-template-columns: minmax(0, 1fr); }
+  .cal { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cal-item:nth-child(4) { border-left: 0; }
+  .cal-item:nth-child(n+4) { border-top: 1px solid var(--line); }
+  .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  nav.main { display: none; }
+  header.site .wrap { justify-content: space-between; }
+}
+@media (max-width: 620px) {
+  .books { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; }
+  .books.six { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cal-item:nth-child(odd) { border-left: 0; }
+  .cal-item:nth-child(4) { border-left: 1px solid var(--line); }
+  .cal-item:nth-child(n+3) { border-top: 1px solid var(--line); }
+  section.block { padding-block: 48px; }
+  .read-feature { padding: 22px; }
+  .sim { left: max(16px, calc(env(safe-area-inset-left, 0px) + 16px)); }
+  footer.site { padding-bottom: 150px; }
+}
+</style>
+<body>
+<div class="proto"><div class="wrap"><span><strong>Protótipo de vitrine.</strong> Catálogo e capas oficiais; preços, checkout e entrega digital segura ainda precisam ser configurados.</span></div></div>
+
+<div class="perks"><div class="wrap">
+  <span>5% de desconto no Pix</span><span>Frete grátis acima de R$ 150</span><span>Compra segura</span>
+</div></div>
+
+<header class="site"><div class="wrap">
+  <a class="logo" href="#inicio" aria-label="Restaura, início"><img src="assets/brand/RESTAURA_Logo_Horizontal_Colorida.svg" alt="Restaura"></a>
+  <nav class="main" aria-label="Principal">
+    <a href="#estante">Livros</a>
+    <a href="#leituras">Leituras</a>
+    <a href="#calendario">Calendário</a>
+    <a href="#sobre">A editora</a>
+  </nav>
+  <div class="tools">
+    <button class="icon-btn" type="button" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+    <button class="icon-btn" type="button" aria-label="Minha conta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>
+    <button class="icon-btn" type="button" aria-label="Sacola de compras" id="bag-open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="bag-count" id="bag-count">0</span></button>
+  </div>
+</div></header>
+
+<main id="inicio">
+  <!-- MENSAGEM DE ENTRADA: muda com o calendário cristão -->
+  <section class="hero" aria-labelledby="hero-title"><div class="wrap">
+    <div>
+      <div class="eyebrow" id="hero-eyebrow">Advento · começa domingo, 29 de novembro</div>
+      <h1 id="hero-title">Esperar também é uma forma de crer</h1>
+      <p class="verse" id="hero-verse">“O povo que andava em trevas viu grande luz, e aos que viviam na região da sombra de morte resplandeceu-lhes a luz.”</p>
+      <p class="verse-ref" id="hero-ref">Isaías 9.2 · Almeida Revista e Atualizada</p>
+      <p class="hero-text" id="hero-text">Nas quatro semanas antes do Natal, a igreja aprende a esperar. Preparamos uma reflexão para cada domingo e uma seleção de livros para ler em casa, sozinho ou em família.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#leituras" id="hero-cta1">Ler a reflexão da semana</a>
+        <a class="btn btn-ghost" href="#estacao" id="hero-cta2">Livros para o Advento</a>
+      </div>
+    </div>
+    <aside class="season-card" id="season-card" aria-label="Domingos da estação"></aside>
+  </div></section>
+
+  <!-- LIVROS LIGADOS À MENSAGEM -->
+  <section class="block" id="estacao" aria-labelledby="estacao-title"><div class="wrap">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow" id="estacao-eyebrow">Para atravessar o Advento</div>
+        <h2 id="estacao-title">Leituras para esta estação</h2>
+        <p id="estacao-sub">Escolhidos pela equipe editorial para acompanhar os quatro domingos até o Natal.</p>
+      </div>
+      <a class="link-more" href="#estante">Ver todos os livros →</a>
+    </div>
+    <div class="books" id="season-books"></div>
+  </div></section>
+
+  <!-- LEITURAS -->
+  <section class="block" id="leituras" aria-labelledby="leituras-title"><div class="wrap">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow">Leituras</div>
+        <h2 id="leituras-title">Para ler hoje</h2>
+      </div>
+      <a class="link-more" href="#leituras">Todas as leituras →</a>
+    </div>
+    <div class="reads">
+      <article class="read-feature">
+        <div class="meta"><span>Reflexão da semana</span><span>6 min de leitura</span></div>
+        <h3>Por que o Advento começa antes do Natal</h3>
+        <p>O calendário cristão não abre o ano com uma festa. Abre com uma espera. Antes de celebrar a chegada, a igreja dedica quatro domingos a reconhecer o que falta, a lembrar as promessas e a preparar a casa. Esta reflexão explica a origem da prática e sugere como vivê-la sem pressa.</p>
+        <div><a class="btn btn-ghost" href="#leituras">Continuar lendo</a></div>
+      </article>
+      <ul class="read-list">
+        <li><a href="#leituras"><div class="meta"><span>Guia prático</span><span>4 min</span></div><h3>A coroa do Advento em casa: um roteiro para quatro domingos</h3></a></li>
+        <li><a href="#leituras"><div class="meta"><span>Data comemorativa</span><span>3 min</span></div><h3>13 de dezembro, Dia da Bíblia: como o livro chegou até nós em português</h3></a></li>
+        <li><a href="#leituras"><div class="meta"><span>Trecho de livro</span><span>5 min</span></div><h3>Leia as primeiras páginas de um título do catálogo</h3></a></li>
+      </ul>
+    </div>
+  </div></section>
+
+  <!-- CALENDÁRIO -->
+  <section class="block" id="calendario" aria-labelledby="cal-title"><div class="wrap">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow">Calendário Restaura</div>
+        <h2 id="cal-title">Próximas datas</h2>
+        <p>A página inicial acompanha o ano cristão e as datas que importam para leitores e igrejas.</p>
+      </div>
+    </div>
+    <div class="cal">
+      <div class="cal-item"><span class="cal-day">29</span><span class="cal-mon">nov · dom</span><span class="cal-name"><span class="cal-dot" style="background:var(--violeta)"></span>1º domingo do Advento</span><span class="cal-note">Também o nascimento de C.S. Lewis (1898)</span></div>
+      <div class="cal-item"><span class="cal-day">30</span><span class="cal-mon">nov · seg</span><span class="cal-name">Dia Nacional do Evangélico</span><span class="cal-note">Lei 12.328/2010</span></div>
+      <div class="cal-item"><span class="cal-day">13</span><span class="cal-mon">dez · dom</span><span class="cal-name">Dia da Bíblia</span><span class="cal-note">2º domingo de dezembro</span></div>
+      <div class="cal-item"><span class="cal-day">25</span><span class="cal-mon">dez · sex</span><span class="cal-name"><span class="cal-dot" style="background:var(--dourado)"></span>Natal</span><span class="cal-note">Início do tempo de Natal</span></div>
+      <div class="cal-item"><span class="cal-day">06</span><span class="cal-mon">jan · qua</span><span class="cal-name">Epifania</span><span class="cal-note">Visita dos magos</span></div>
+      <div class="cal-item"><span class="cal-day">10</span><span class="cal-mon">fev · qua</span><span class="cal-name"><span class="cal-dot" style="background:var(--violeta)"></span>Início da Quaresma</span><span class="cal-note">Páscoa em 28 de março de 2027</span></div>
+    </div>
+  </div></section>
+
+  <!-- ESTANTE (LOJA) -->
+  <section class="block" id="estante" aria-labelledby="estante-title"><div class="wrap">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow">Estante</div>
+        <h2 id="estante-title">Livros da Restaura</h2>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Filtrar estante">
+        <button class="tab" role="tab" aria-selected="true" data-tab="lanc" id="tab-lanc">Lançamentos</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="mais" id="tab-mais">Mais lidos</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="pres" id="tab-pres">Para presentear</button>
+      </div>
+    </div>
+    <div class="books six" id="shelf" role="tabpanel"></div>
+  </div></section>
+
+  <!-- SOBRE + NEWSLETTER -->
+  <section class="block" id="sobre" aria-labelledby="sobre-title"><div class="wrap about">
+    <div>
+      <div class="eyebrow">A editora</div>
+      <h2 id="sobre-title">Livros para reconstruir</h2>
+      <p>A Restaura publica livros cristãos que acolhem quem lê e levam a sério as perguntas difíceis. Cada título passa por edição cuidadosa, que respeita a voz de quem escreveu.</p>
+      <p>A Restaura publica obras que aproximam fé, emoção e vida cotidiana, com linguagem cuidadosa e compromisso com a restauração da pessoa.</p>
+      <a class="link-more" href="#sobre">Conheça a editora →</a>
+    </div>
+    <div class="news">
+      <h3>A reflexão da semana no seu e-mail</h3>
+      <p>Um texto curto por semana, as datas do calendário cristão e os lançamentos da editora. Você pode sair quando quiser.</p>
+      <form id="news-form">
+        <label for="news-email" class="sr" style="position:absolute;left:-9999px">Seu e-mail</label>
+        <input id="news-email" type="email" placeholder="seu@email.com" required>
+        <button class="btn btn-primary" type="submit">Assinar</button>
+      </form>
+      <p class="ok" id="news-ok" hidden>Inscrição simulada. No site real, o e-mail vai para a ferramenta de newsletter.</p>
+    </div>
+  </div></section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <div class="foot-grid">
+    <div>
+      <div class="logo"><img src="assets/brand/RESTAURA_Logo_Horizontal_Colorida.svg" alt="Restaura"></div>
+      <p>Editora cristã. Livros impressos, e-books e audiolivros.</p>
+      <div class="pay" aria-label="Formas de pagamento"><span>Pix</span><span>Visa</span><span>Mastercard</span><span>Elo</span><span>Boleto</span></div>
+    </div>
+    <div><h4>Livros</h4><ul><li><a href="#estante">Lançamentos</a></li><li><a href="#estante">Catálogo completo</a></li><li><a href="#estante">E-books</a></li><li><a href="#estante">Audiolivros</a></li></ul></div>
+    <div><h4>Leituras</h4><ul><li><a href="#leituras">Reflexões</a></li><li><a href="#calendario">Calendário cristão</a></li><li><a href="#leituras">Trechos de livros</a></li><li><a href="#sobre">Newsletter</a></li></ul></div>
+    <div><h4>Ajuda</h4><ul><li><a href="#inicio">Frete e prazos</a></li><li><a href="#inicio">Trocas e devoluções</a></li><li><a href="#inicio">Rastrear pedido</a></li><li><a href="#inicio">Fale conosco</a></li></ul></div>
+  </div>
+  <div class="foot-bottom"><span>Restaura · CNPJ e endereço a preencher</span><span>Protótipo de conceito, novembro de 2026</span></div>
+</div></footer>
+
+<div class="sim" role="group" aria-label="Simular estação do ano">
+  <span class="sim-label">Simular a home em outra data</span>
+  <div class="sim-opts" id="sim-opts"></div>
+</div>
+
+<div class="cart-backdrop" id="cart-backdrop"></div>
+<aside class="cart-drawer" id="cart-drawer" aria-label="Sacola de compras" aria-hidden="true">
+  <div class="cart-head"><h2>Sua sacola</h2><button class="cart-close" type="button" id="cart-close" aria-label="Fechar sacola">×</button></div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total</span><strong id="cart-total">R$ 0,00</strong></div>
+    <button class="btn btn-primary" type="button" id="checkout">Ir para o pagamento</button>
+  </div>
+</aside>
+
+<script>
+(function () {
+  const pix = v => (v * 0.95).toFixed(2).replace('.', ',');
+  const brl = v => v.toFixed(2).replace('.', ',');
+
+  // Catálogo real da Restaura
+  const B = {
+    altar: {
+      t: 'Além do Altar', a: 'Cristiano Souza', c: 'c1', p: 59.9, o: 69.9,
+      cover: 'capas/alem-do-altar.jpg',
+      why: 'Para líderes que cuidam de todos, mas já não sabem como cuidar de si.',
+      summary: 'Entre o púlpito e o silêncio da alma, Cristiano Souza conduz uma jornada sobre o esgotamento emocional e espiritual enfrentado por líderes. Ao revisitar Elias debaixo do zimbro, mostra que até os homens mais fortes podem chegar ao limite — e que Deus continua presente para restaurar.',
+      sales: [
+        { label: 'Comprar livro impresso · UICLAP', url: 'https://loja.uiclap.com/titulo/ua199967/' },
+        { label: 'Comprar e-book Kindle · Amazon', url: 'https://www.amazon.com.br/dp/B0GX3BBQY8' }
+      ],
+      formats: [
+        { id: 'epub', label: 'E-book (EPUB)', price: 39.9, available: true, note: 'EPUB localizado. Preço demonstrativo; entrega segura ainda não conectada.' },
+        { id: 'print', label: 'Livro impresso', available: false, note: 'Disponibilidade, estoque, preço e frete a confirmar.' },
+        { id: 'audio', label: 'Audiolivro', available: false, note: 'Faixas encontradas; pacote de venda e entrega ainda precisa ser preparado.' }
+      ]
+    },
+    fe: {
+      t: 'A fé que declara e a fé que espera', a: 'Cristiano Souza', c: 'c5', p: 54.9,
+      cover: 'capas/a-fe-que-espera.png',
+      why: 'Um caminho equilibrado entre o clamor e o descanso.',
+      summary: 'O que fazer quando a oração parece não ser respondida? Entre a ousadia de quem declara e a quietude de quem confia, este livro conduz à maturidade de pedir como filho e descansar na soberania bondosa de Deus.',
+      sales: [
+        { label: 'Comprar livro impresso · UICLAP', url: 'https://loja.uiclap.com/titulo/ua193170/' }
+      ],
+      formats: [
+        { id: 'epub', label: 'E-book (EPUB)', price: 34.9, available: true, note: 'EPUB localizado. Preço demonstrativo; entrega segura ainda não conectada.' },
+        { id: 'print', label: 'Livro impresso', available: false, note: 'Disponibilidade, estoque, preço e frete a confirmar.' },
+        { id: 'audio', label: 'Audiolivro', available: false, note: 'Faixas encontradas; pacote de venda e entrega ainda precisa ser preparado.' }
+      ]
+    },
+    prisoes: {
+      t: 'Prisões sem grades', a: 'Cristiano Souza', c: 'c6', p: 49.9, o: 59.9,
+      cover: 'capas/prisoes-sem-grades.jpg',
+      why: 'Um convite para soltar mágoas e reencontrar a paz.',
+      summary: 'A mágoa, o tribunal interno e a culpa podem formar prisões invisíveis. Unindo sabedoria bíblica e escuta psicanalítica, Cristiano Souza mostra que o perdão é processo: reconhecer a dor, abrir mão da vingança e estabelecer limites sem viver prisioneiro do que aconteceu.',
+      formats: [
+        { id: 'epub', label: 'E-book (EPUB)', price: 29.9, available: true, note: 'EPUB validado; revisão final e entrega segura ainda pendentes.' },
+        { id: 'print', label: 'Livro impresso', available: false, note: 'Arquivo impresso ainda está em prova; estoque e preço a confirmar.' },
+        { id: 'audio', label: 'Audiolivro', available: false, note: 'Audiolivro ainda em produção.' }
+      ]
+    },
+    alma: {
+      t: 'Quando a Alma Volta a Respirar', a: 'Cristiano Souza', c: 'c2', p: 64.9,
+      cover: 'capas/quando-a-alma-volta-a-respirar.jpg',
+      why: 'Para quem está cansado por dentro e precisa reencontrar sentido.',
+      summary: 'Existe um cansaço que o sono não cura. A partir da promessa de Êxodo 33, este livro conduz o leitor por uma jornada para curar a alma cansada, reconstruir vínculos, reordenar prioridades e encontrar paz na presença de Deus.',
+      sales: [
+        { label: 'Comprar livro impresso · UICLAP', url: 'https://loja.uiclap.com/titulo/ua198024/' }
+      ],
+      formats: [
+        { id: 'epub', label: 'E-book (EPUB)', price: 42.9, available: true, note: 'EPUB localizado. Preço demonstrativo; entrega segura ainda não conectada.' },
+        { id: 'print', label: 'Livro impresso', available: false, note: 'Disponibilidade, estoque, preço e frete a confirmar.' },
+        { id: 'audio', label: 'Audiolivro', available: false, note: 'Pacote de publicação preparado; falta publicar e gerar os links de venda.' }
+      ]
+    }
+  };
+
+  const SEASONS = {
+    advento: {
+      label: 'Advento', dot: 'var(--violeta)',
+      eyebrow: 'Advento · começa domingo, 29 de novembro',
+      title: 'Esperar também é uma forma de crer',
+      verse: '“O povo que andava em trevas viu grande luz, e aos que viviam na região da sombra de morte resplandeceu-lhes a luz.”',
+      ref: 'Isaías 9.2 · Almeida Revista e Atualizada',
+      text: 'Nas quatro semanas antes do Natal, a igreja aprende a esperar. Preparamos uma reflexão para cada domingo e uma seleção de livros para ler em casa, sozinho ou em família.',
+      cta1: 'Ler a reflexão da semana', cta2: 'Livros para o Advento',
+      shelfEyebrow: 'Para atravessar o Advento', shelfSub: 'Escolhidos pela equipe editorial para acompanhar os quatro domingos até o Natal.',
+      books: ['altar', 'fe', 'alma', 'prisoes'],
+      card: () => `
+        <h2>Os quatro domingos</h2>
+        <p class="sub">Uma vela acesa a cada semana até o Natal</p>
+        <ol class="weeks">
+          <li class="next"><span class="candle lit" aria-hidden="true"></span><span class="w-name">Esperança<span class="w-note">Isaías 9 · reflexão já disponível</span></span><span class="w-date">29 nov</span></li>
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Paz<span class="w-note">Isaías 11</span></span><span class="w-date">6 dez</span></li>
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Alegria<span class="w-note">Também Dia da Bíblia</span></span><span class="w-date">13 dez</span></li>
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Amor<span class="w-note">Lucas 1</span></span><span class="w-date">20 dez</span></li>
+        </ol>
+        <div class="season-foot"><span class="swatch"></span>Cor litúrgica: violeta. O destaque do site acompanha a estação.</div>`
+    },
+    natal: {
+      label: 'Natal', dot: 'var(--dourado)',
+      eyebrow: 'Natal · 25 de dezembro',
+      title: 'A luz prometida chegou',
+      verse: '“É que hoje vos nasceu, na cidade de Davi, o Salvador, que é Cristo, o Senhor.”',
+      ref: 'Lucas 2.11 · Almeida Revista e Atualizada',
+      text: 'O tempo de Natal vai de 25 de dezembro à Epifania, em 6 de janeiro. São doze dias para celebrar com calma, ler o evangelho de Lucas e dar livros que fiquem.',
+      cta1: 'Ler a mensagem de Natal', cta2: 'Livros para presentear',
+      shelfEyebrow: 'Para os doze dias de Natal', shelfSub: 'Leituras para a ceia, para a família e para presentear.',
+      books: ['alma', 'altar', 'fe', 'prisoes'],
+      card: () => `
+        <h2>Os doze dias de Natal</h2>
+        <p class="sub">De 25 de dezembro a 6 de janeiro</p>
+        <ol class="weeks">
+          <li class="next"><span class="candle lit" aria-hidden="true"></span><span class="w-name">Natal<span class="w-note">Lucas 2.1-20</span></span><span class="w-date">25 dez</span></li>
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Ano Novo<span class="w-note">Salmo 90</span></span><span class="w-date">1 jan</span></li>
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Epifania<span class="w-note">Mateus 2.1-12</span></span><span class="w-date">6 jan</span></li>
+        </ol>
+        <div class="season-foot"><span class="swatch"></span>Cor litúrgica: branco e dourado.</div>`
+    },
+    comum: {
+      label: 'Semana comum', dot: 'var(--verde)',
+      eyebrow: 'Trecho da semana · 18 a 24 de janeiro',
+      title: 'Recomeçar com o que restou',
+      verse: '',
+      ref: '',
+      text: 'Nas semanas sem data especial, a página inicial abre com um trecho de um livro da casa. Quem gostar continua a leitura no próprio livro.',
+      cta1: 'Ler o trecho completo', cta2: 'Conhecer o livro',
+      shelfEyebrow: 'Do mesmo autor e tema', shelfSub: 'Livros próximos ao trecho desta semana.',
+      books: ['alma', 'altar', 'fe', 'prisoes'],
+      card: () => `
+        <div class="excerpt-card">
+          <blockquote>Ninguém reconstrói uma casa começando pelo telhado. Começa recolhendo o que ficou de pé, separando o que ainda serve, e aceitando que algumas paredes terão outro lugar.</blockquote>
+          <div class="from"><span>Trecho editorial ilustrativo</span></div>
+          <div class="season-foot"><span class="swatch"></span>Tempo comum · cor litúrgica: verde.</div>
+        </div>`
+    },
+    pentecostes: {
+      label: 'Pentecostes', dot: 'var(--vermelho)',
+      eyebrow: 'Pentecostes · 16 de maio de 2027',
+      title: 'Cada um ouvia na sua própria língua',
+      verse: '“Todos ficaram cheios do Espírito Santo e passaram a falar em outras línguas, segundo o Espírito lhes concedia que falassem.”',
+      ref: 'Atos 2.4 · Almeida Revista e Atualizada',
+      text: 'Cinquenta dias depois da Páscoa, a igreja lembra a vinda do Espírito Santo. Uma data para falar de missão, de unidade e da igreja que nasce em Jerusalém.',
+      cta1: 'Ler a reflexão de Pentecostes', cta2: 'Livros sobre a igreja',
+      shelfEyebrow: 'Para Pentecostes', shelfSub: 'Leituras sobre o Espírito, a missão e a vida em comunidade.',
+      books: ['fe', 'prisoes', 'altar', 'alma'],
+      card: () => `
+        <h2>De Páscoa a Pentecostes</h2>
+        <p class="sub">Os cinquenta dias de 2027</p>
+        <ol class="weeks">
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Páscoa<span class="w-note">Mateus 28</span></span><span class="w-date">28 mar</span></li>
+          <li><span class="candle" aria-hidden="true"></span><span class="w-name">Ascensão<span class="w-note">Atos 1</span></span><span class="w-date">6 mai</span></li>
+          <li class="next"><span class="candle lit" aria-hidden="true"></span><span class="w-name">Pentecostes<span class="w-note">Atos 2</span></span><span class="w-date">16 mai</span></li>
+        </ol>
+        <div class="season-foot"><span class="swatch"></span>Cor litúrgica: vermelho.</div>`
+    }
+  };
+
+  const SHELVES = {
+    lanc: ['alma', 'fe', 'prisoes', 'altar'],
+    mais: ['altar', 'alma', 'fe', 'prisoes'],
+    pres: ['alma', 'altar', 'fe', 'prisoes']
+  };
+
+  function bookHTML(id, withWhy) {
+    const b = B[id];
+    const activeFormat = b.formats.find(format => format.available);
+    const formatOptions = b.formats.map(format =>
+      `<option value="${format.id}" ${format.available ? '' : 'disabled'}>${format.label}${format.available ? '' : ' — em breve'}</option>`
+    ).join('');
+    return `<article class="book">
+      <div class="cover real-cover" role="img" aria-label="Capa de ${b.t}">
+        <img src="${b.cover}" alt="Capa do livro ${b.t}">
+      </div>
+      <div><p class="b-title">${b.t}</p><p class="b-author">${b.a}</p></div>
+      ${withWhy && b.why ? `<p class="b-why">${b.why}</p>` : ''}
+      ${withWhy ? `<p class="book-summary">${b.summary}</p>` : ''}
+      <div class="format-field">
+        <label for="format-${id}-${withWhy ? 'feature' : 'shelf'}">Formato</label>
+        <select id="format-${id}-${withWhy ? 'feature' : 'shelf'}" data-format-select data-book="${id}" aria-label="Formato de ${b.t}">${formatOptions}</select>
+        <p class="format-note" data-format-note>${activeFormat.note}</p>
+      </div>
+      <div class="price" data-format-price><strong>R$ ${brl(activeFormat.price)}</strong><small>R$ ${pix(activeFormat.price)} no Pix</small></div>
+      <button class="buy" type="button" data-book="${id}" data-format="${activeFormat.id}">Adicionar à sacola</button>
+      ${b.sales?.length ? `<div class="store-links" aria-label="Links de compra">${b.sales.map(sale => `<a class="store-link" href="${sale.url}" target="_blank" rel="noopener noreferrer">${sale.label}</a>`).join('')}</div>` : ''}
+    </article>`;
+  }
+
+  const $ = id => document.getElementById(id);
+  const bag = new Map();
+  const cartKey = (bookId, formatId) => `${bookId}:${formatId}`;
+
+  function openCart(open) {
+    $('cart-drawer').classList.toggle('open', open);
+    $('cart-backdrop').classList.toggle('open', open);
+    $('cart-drawer').setAttribute('aria-hidden', String(!open));
+  }
+
+  function renderCart() {
+    const items = [...bag.values()];
+    let count = 0;
+    let total = 0;
+    const html = items.length ? items.map(item => {
+      const b = B[item.bookId];
+      const format = b.formats.find(option => option.id === item.formatId);
+      const qty = item.qty;
+      count += qty;
+      total += format.price * qty;
+      return `<article class="cart-item">
+        <div class="cart-thumb"><img src="${b.cover}" alt=""></div>
+        <div class="cart-info">
+          <strong>${b.t}</strong>
+          <small>${format.label} · R$ ${brl(format.price)} cada</small>
+          <div class="qty" aria-label="Quantidade">
+            <button type="button" data-cart-action="minus" data-book-id="${item.bookId}" data-format-id="${item.formatId}" aria-label="Diminuir quantidade">−</button>
+            <span>${qty}</span>
+            <button type="button" data-cart-action="plus" data-book-id="${item.bookId}" data-format-id="${item.formatId}" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+        <button class="cart-remove" type="button" data-cart-action="remove" data-book-id="${item.bookId}" data-format-id="${item.formatId}">Remover</button>
+      </article>`;
+    }).join('') : '<p class="cart-empty">Sua sacola está vazia.</p>';
+    $('cart-items').innerHTML = html;
+    $('cart-total').textContent = `R$ ${brl(total)}`;
+    $('bag-count').textContent = count;
+  }
+
+  function setSeason(key) {
+    const s = SEASONS[key];
+    document.documentElement.setAttribute('data-season', key);
+    $('hero-eyebrow').textContent = s.eyebrow;
+    $('hero-title').textContent = s.title;
+    $('hero-verse').textContent = s.verse; $('hero-verse').hidden = !s.verse;
+    $('hero-ref').textContent = s.ref; $('hero-ref').hidden = !s.ref;
+    $('hero-text').textContent = s.text;
+    $('hero-cta1').textContent = s.cta1;
+    $('hero-cta2').textContent = s.cta2;
+    $('season-card').innerHTML = s.card();
+    $('estacao-eyebrow').textContent = s.shelfEyebrow;
+    $('estacao-sub').textContent = s.shelfSub;
+    $('season-books').innerHTML = s.books.map(id => bookHTML(id, true)).join('');
+    document.querySelectorAll('#sim-opts button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.season === key)));
+  }
+
+  function setShelf(key) {
+    $('shelf').innerHTML = SHELVES[key].map(id => bookHTML(id, false)).join('');
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === key)));
+  }
+
+  $('sim-opts').innerHTML = Object.entries(SEASONS).map(([k, s]) =>
+    `<button type="button" data-season="${k}" aria-pressed="false"><i style="background:${s.dot}"></i>${s.label}</button>`).join('');
+  $('sim-opts').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSeason(b.dataset.season); });
+  document.querySelector('.tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) setShelf(t.dataset.tab); });
+
+  document.addEventListener('change', e => {
+    const select = e.target.closest('[data-format-select]');
+    if (!select) return;
+    const book = B[select.dataset.book];
+    const format = book.formats.find(option => option.id === select.value);
+    if (!format || !format.available) return;
+    const card = select.closest('.book');
+    card.querySelector('[data-format-note]').textContent = format.note;
+    card.querySelector('[data-format-price]').innerHTML =
+      `<strong>R$ ${brl(format.price)}</strong><small>R$ ${pix(format.price)} no Pix</small>`;
+    const buy = card.querySelector('.buy');
+    buy.dataset.format = format.id;
+    buy.classList.toggle('added', bag.has(cartKey(select.dataset.book, format.id)));
+    buy.textContent = buy.classList.contains('added') ? 'Na sacola' : 'Adicionar à sacola';
+  });
+
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.buy'); if (!b || b.classList.contains('added')) return;
+    const bookId = b.dataset.book;
+    const formatId = b.dataset.format;
+    const book = B[bookId];
+    const format = book.formats.find(option => option.id === formatId);
+    if (!format || !format.available) return;
+    const key = cartKey(bookId, formatId);
+    const existing = bag.get(key);
+    bag.set(key, { bookId, formatId, qty: (existing?.qty || 0) + 1 });
+    renderCart();
+    b.classList.add('added'); b.textContent = 'Na sacola';
+    openCart(true);
+  });
+
+  $('bag-open').addEventListener('click', () => openCart(true));
+  $('cart-close').addEventListener('click', () => openCart(false));
+  $('cart-backdrop').addEventListener('click', () => openCart(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') openCart(false); });
+  $('cart-items').addEventListener('click', e => {
+    const b = e.target.closest('[data-cart-action]');
+    if (!b) return;
+    const key = cartKey(b.dataset.bookId, b.dataset.formatId);
+    const action = b.dataset.cartAction;
+    const item = bag.get(key);
+    if (!item) return;
+    if (action === 'remove') bag.delete(key);
+    if (action === 'minus') item.qty <= 1 ? bag.delete(key) : bag.set(key, { ...item, qty: item.qty - 1 });
+    if (action === 'plus') bag.set(key, { ...item, qty: item.qty + 1 });
+    renderCart();
+    document.querySelectorAll('.buy').forEach(button => {
+      const isInCart = bag.has(cartKey(button.dataset.book, button.dataset.format));
+      button.classList.toggle('added', isInCart);
+      button.textContent = isInCart ? 'Na sacola' : 'Adicionar à sacola';
+    });
+  });
+  $('checkout').addEventListener('click', () => {
+    if (!bag.size) { openCart(false); return; }
+    alert('Protótipo: checkout e entrega protegida dos arquivos serão conectados à plataforma de vendas escolhida.');
+  });
+
+  $('news-form').addEventListener('submit', e => { e.preventDefault(); $('news-ok').hidden = false; });
+
+  setSeason('advento');
+  setShelf('lanc');
+})();
+</script>
+</body>
+</html>
